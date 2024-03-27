@@ -80,8 +80,8 @@ export class UserService {
         console.log('Inside if condition ', newUserResponse);
         return newUserResponse;
       }
-      //   const response = await new this.socialMediaModel(socialMediaDto).save();
-      const response = await this.socialMediaModel.insertMany([socialMediaDto]);
+      const response = await new this.socialMediaModel(socialMediaDto).save();
+      // const response = await this.socialMediaModel.insertMany([socialMediaDto]);
       return response;
     } catch (error) {
       console.error(error);
