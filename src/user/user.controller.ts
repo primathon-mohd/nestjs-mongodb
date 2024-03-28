@@ -23,7 +23,7 @@ import { JwtGuard } from 'src/auth/guard/jwt.guard';
 import { Request } from 'express';
 import mongoose from 'mongoose';
 import { HttpExceptionFilter } from 'src/utils/exception.filter';
-
+import { Query as ExpressQuery } from 'express-serve-static-core';
 @ApiTags('USER')
 @ApiBearerAuth()
 @ApiResponse({
@@ -50,6 +50,12 @@ export class UserController {
       );
     }
     return await this.userService.getUserInfo(id);
+  }
+
+  @Get('info')
+  async getUserInfoPagination(@Query() query: ExpressQuery) {
+    console.log('Inside getUserInfoPagination controller method !!', query);
+    return await this.userService.getSocialMediaInfoPagination(query);
   }
 
   @ApiResponse({

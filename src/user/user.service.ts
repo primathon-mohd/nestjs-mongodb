@@ -11,6 +11,7 @@ import { RegisteredUser, UserDocument } from 'src/auth/schema/user.schema';
 import { SocialMedia, SocialMediaDocument } from './schema/social.schema';
 import { SocialMediaDto } from './dto';
 import { SettingDocument, UserSetting } from './schema/setting.schema';
+import { Query } from 'express-serve-static-core';
 
 @Injectable()
 export class UserService {
@@ -59,6 +60,38 @@ export class UserService {
     }
   }
 
+  async getSocialMediaInfoPagination(query: Query) {
+    // Response Per Page , should be configurable ...
+    // Add + , for conversion of string value to numeric.. Or use Number(stringVal)
+    const responsePerPage = +process.env.RESPONSE_PER_PAGE;
+    const currentPage = Number(query.page) || 1;
+    const skipPage = responsePerPage * (currentPage - 1);
+    const keyword = query.keyword
+      ? {
+          displayName: {
+            $regex: query.keyword,
+            $options: 'i', // CASE INSENSITIVE
+          },
+        }
+      : {};
+    console.log(
+      'Inside getSocialMediaInfoPagination service method !! ',
+      responsePerPage,
+      currentPage,
+      keyword,
+      skipPage,
+    );
+    // Order preference .. sort>> skip >> limit
+    const result = await this.socialMediaModel
+      .find({ ...keyword })
+      .sort('username')
+      .limit(responsePerPage)
+      .skip(skipPage);
+    // .projection({ username: 1, displayName: 1 });
+
+    return result;
+  }
+
   async createSocialMedia({ settings, ...socialMediaDto }: SocialMediaDto) {
     try {
       if (settings) {
@@ -80,8 +113,8 @@ export class UserService {
         console.log('Inside if condition ', newUserResponse);
         return newUserResponse;
       }
-      //   const response = await new this.socialMediaModel(socialMediaDto).save();
-      const response = await this.socialMediaModel.insertMany([socialMediaDto]);
+      const response = await new this.socialMediaModel(socialMediaDto).save();
+      // const response = await this.socialMediaModel.insertMany([socialMediaDto]);
       return response;
     } catch (error) {
       console.error(error);
