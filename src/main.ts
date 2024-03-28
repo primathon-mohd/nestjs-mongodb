@@ -24,7 +24,7 @@ async function bootstrap() {
   app.useGlobalFilters(new HttpExceptionFilter());
 
   app.use(
-    ['docs', 'docs-json'],
+    ['/docs', '/docs-json'],
     basicAuth({
       challenge: true,
       users: {
@@ -51,6 +51,10 @@ async function bootstrap() {
       scheme: 'bearer',
       bearerFormat: 'JWT',
     })
+    // .addSecurity('basic', {
+    //   type: 'http',
+    //   scheme: 'basic',
+    // })
     .build();
   const options: SwaggerDocumentOptions = {
     operationIdFactory: (

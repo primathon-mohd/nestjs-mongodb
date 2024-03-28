@@ -81,12 +81,15 @@ export class UserController {
     type: 'number',
     name: 'page',
     required: false,
-    description: `Provide current page `,
-    //  Each page will show ${process.env.RESPONSE_PER_PAGE} numbers of docs.`,
+    description: `Provide current page ,
+     Each page will show ${process.env.RESPONSE_PER_PAGE} numbers of docs.`,
   })
   @Get('info')
   async getUserInfoPagination(@Query() query: ExpressQuery) {
     console.log('Inside getUserInfoPagination controller method !!', query);
+    console.log(
+      `${process.env.RESPONSE_PER_PAGE}  and ${this.configService.get('RESPONSE_PER_PAGE')}`,
+    );
     return await this.userService.getSocialMediaInfoPagination(query);
   }
 
@@ -95,7 +98,7 @@ export class UserController {
     description: 'Not Found',
   })
   @ApiParam({
-    type: 'number',
+    type: 'string',
     name: 'username',
     description: 'Provide username from docs',
   })
