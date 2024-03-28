@@ -16,7 +16,14 @@ import {
   ValidationPipe,
   UseFilters,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiParam,
+  ApiQuery,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { UserService } from './user.service';
 import { SocialMediaDto } from './dto';
 import { JwtGuard } from 'src/auth/guard/jwt.guard';
@@ -24,7 +31,8 @@ import { Request } from 'express';
 import mongoose from 'mongoose';
 import { HttpExceptionFilter } from 'src/utils/exception.filter';
 import { Query as ExpressQuery } from 'express-serve-static-core';
-@ApiTags('USER')
+import { ConfigService } from '@nestjs/config';
+@ApiTags('USER Management')
 @ApiBearerAuth()
 @ApiResponse({
   status: 401,
@@ -33,11 +41,19 @@ import { Query as ExpressQuery } from 'express-serve-static-core';
 @UseGuards(JwtGuard)
 @Controller('user')
 export class UserController {
-  constructor(private userService: UserService) {}
+  constructor(
+    private userService: UserService,
+    private configService: ConfigService,
+  ) {}
 
   @ApiResponse({
     status: 404,
     description: 'Not Found',
+  })
+  @ApiParam({
+    type: 'number',
+    name: 'id',
+    description: 'Provide _id from docs',
   })
   @Get('info/:id')
   async getUserInfo(@Param('id') id: string) {
@@ -52,6 +68,22 @@ export class UserController {
     return await this.userService.getUserInfo(id);
   }
 
+  @ApiResponse({
+    status: 404,
+    description: 'Not Found',
+  })
+  @ApiQuery({
+    type: 'string',
+    name: 'keyword',
+    description: 'Provide displayName as regex. CASE INSENSITIVE',
+  })
+  @ApiQuery({
+    type: 'number',
+    name: 'page',
+    required: false,
+    description: `Provide current page `,
+    //  Each page will show ${process.env.RESPONSE_PER_PAGE} numbers of docs.`,
+  })
   @Get('info')
   async getUserInfoPagination(@Query() query: ExpressQuery) {
     console.log('Inside getUserInfoPagination controller method !!', query);
@@ -61,6 +93,11 @@ export class UserController {
   @ApiResponse({
     status: 404,
     description: 'Not Found',
+  })
+  @ApiParam({
+    type: 'number',
+    name: 'username',
+    description: 'Provide username from docs',
   })
   @Get('details/:username')
   async getUserDetails(
@@ -75,6 +112,7 @@ export class UserController {
     status: 400,
     description: 'Bad Request',
   })
+  @ApiBody({ type: SocialMediaDto })
   @UseFilters(new HttpExceptionFilter())
   @UsePipes(new ValidationPipe())
   @Post('create')
@@ -87,6 +125,12 @@ export class UserController {
     status: 400,
     description: 'Bad Request',
   })
+  @ApiParam({
+    type: 'number',
+    name: 'id',
+    description: 'Provide _id from docs',
+  })
+  @ApiBody({ type: SocialMediaDto })
   @UsePipes(new ValidationPipe())
   @Put('update/:id')
   async updateSocialMedia(
@@ -105,6 +149,12 @@ export class UserController {
     status: 400,
     description: 'Bad Request',
   })
+  @ApiParam({
+    type: 'number',
+    name: 'username',
+    description: 'Provide username from docs',
+  })
+  @ApiBody({ type: SocialMediaDto })
   @UsePipes(new ValidationPipe())
   @Patch('update/:username')
   async updateSocialMediaUserName(
@@ -118,14 +168,24 @@ export class UserController {
     status: 400,
     description: 'Bad Request',
   })
+  @ApiParam({
+    type: 'string',
+    name: 'username',
+    description: 'Provide username from docs',
+  })
   @Delete('delete/:username')
-  async deleteUser(@Param(':username') username: string) {
+  async deleteUser(@Param('username') username: string) {
     return await this.userService.deleteSocialMedia(username);
   }
 
   @ApiResponse({
     status: 400,
     description: 'Bad Request',
+  })
+  @ApiQuery({
+    type: 'number',
+    name: 'id',
+    description: 'Provide _id from docs',
   })
   @Delete('deleteId')
   async deleteUserById(@Query('id') id: string) {
@@ -139,6 +199,11 @@ export class UserController {
   // @ApiResponse({
   //   status: 400,
   //   description: 'Bad Request',
+  // })
+  // @ApiParam({
+  //   type: 'number',
+  //   name: 'id',
+  //   description: 'Provide _id from docs',
   // })
   // @Delete('deleteId/:id')
   // async deleteUserById(@Param('id') id: string) {

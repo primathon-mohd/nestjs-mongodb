@@ -43,6 +43,7 @@ export class SocialMediaDto {
     description: 'User Settings !!',
     required: false,
   })
+  @ApiProperty({ type: () => UserSettingsDto })
   @IsOptional()
   @ValidateNested()
   @Type(() => UserSettingsDto)

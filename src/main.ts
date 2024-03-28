@@ -45,7 +45,7 @@ async function bootstrap() {
       "User Management description : Three Types of users are available to manage the organization's data !!",
     )
     .setVersion('1.0')
-    .addTag('User Management END-POINTS')
+    .addTag('User Management Project END-POINTS')
     .addBearerAuth({
       type: 'http',
       scheme: 'bearer',
